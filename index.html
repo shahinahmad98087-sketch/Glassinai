@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trainable AI Assistant</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 5%;
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            font-weight: 700;
+            font-size: 24px;
+        }
+        
+        .logo i {
+            margin-left: 10px;
+            background: linear-gradient(135deg, #00b4db, #0083b0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+        
+        nav ul li {
+            margin: 0 15px;
+        }
+        
+        nav ul li a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        nav ul li a:hover {
+            color: #00b4db;
+        }
+        
+        .container {
+            display: flex;
+            flex: 1;
+            padding: 20px;
+            gap: 20px;
+        }
+        
+        .chat-container {
+            flex: 2;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .training-panel {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .chat-box {
+            height: 400px;
+            overflow-y: auto;
+            padding: 20px;
+            margin-bottom: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            text-align: left;
+        }
+        
+        .message {
+            padding: 10px 15px;
+            margin: 10px 0;
+            border-radius: 10px;
+            max-width: 70%;
+        }
+        
+        .user-message {
+            background: rgba(0, 180, 219, 0.2);
+            margin-left: auto;
+            text-align: right;
+        }
+        
+        .ai-message {
+            background: rgba(42, 157, 143, 0.2);
+            text-align: left;
+        }
+        
+        .chat-input {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .chat-input input {
+            flex: 1;
+            padding: 12px 15px;
+            border: none;
+            border-radius: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+        }
+        
+        .chat-input button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 30px;
+            background: linear-gradient(135deg, #00b4db, #0083b0);
+            color: white;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        
+        .training-form {
+            margin-bottom: 20px;
+        }
+        
+        .training-form input {
+            width: 100%;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+        }
+        
+        .training-form button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #2a9d8f, #264653);
+            color: white;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        
+        .knowledge-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .knowledge-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .knowledge-item button {
+            background: rgba(255, 100, 100, 0.3);
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 30px;
+            background: rgba(0, 0, 0, 0.3);
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            nav ul {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            TrainableAI <i class="fas fa-robot"></i>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="#">Home</a></li>
+                <li><a href="#">Train</a></li>
+                <li><a href="#">Chat</a></li>
+                <li><a href="#">About</a></li>
+            </ul>
+        </nav>
+    </header>
+    
+    <div class="container">
+        <div class="chat-container">
+            <div class="panel-header">
+                <h2>Chat with AI Assistant</h2>
+            </div>
+            <div class="chat-box" id="chatBox">
+                <div class="message ai-message">
+                    Hello! I'm your trainable AI assistant. You can teach me new things using the training panel on the right.
+                </div>
+            </div>
+            <div class="chat-input">
+                <input type="text" id="userInput" placeholder="Type your message here...">
+                <button onclick="sendMessage()"><i class="fas fa-paper-plane"></i> Send</button>
+            </div>
+        </div>
+        
+        <div class="training-panel">
+            <div class="panel-header">
+                <h2>Train Your AI</h2>
+            </div>
+            <div class="training-form">
+                <input type="text" id="trainQuestion" placeholder="Enter a question...">
+                <input type="text" id="trainAnswer" placeholder="Enter the answer...">
+                <button onclick="trainAI()"><i class="fas fa-graduation-cap"></i> Train AI</button>
+            </div>
+            <h3>Knowledge Base</h3>
+            <div class="knowledge-list" id="knowledgeList">
+                <!-- Knowledge items will be added here -->
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <p>© 2023 TrainableAI. All rights reserved. | AI Assistant with Training Capability</p>
+    </footer>
+
+    <script>
+        // Knowledge base for the AI
+        let knowledgeBase = [];
+        
+        // Load knowledge from localStorage if available
+        if (localStorage.getItem('aiKnowledge')) {
+            knowledgeBase = JSON.parse(localStorage.getItem('aiKnowledge'));
+            updateKnowledgeList();
+        }
+        
+        // Function to train the AI
+        function trainAI() {
+            const questionInput = document.getElementById('trainQuestion');
+            const answerInput = document.getElementById('trainAnswer');
+            
+            const question = questionInput.value.trim();
+            const answer = answerInput.value.trim();
+            
+            if (question && answer) {
+                // Add to knowledge base
+                knowledgeBase.push({ question, answer });
+                
+                // Save to localStorage
+                localStorage.setItem('aiKnowledge', JSON.stringify(knowledgeBase));
+                
+                // Update the UI
+                updateKnowledgeList();
+                
+                // Clear inputs
+                questionInput.value = '';
+                answerInput.value = '';
+                
+                // Show confirmation
+                addMessage('AI trained successfully!', 'ai');
+            } else {
+                addMessage('Please provide both a question and an answer for training.', 'ai');
+            }
+        }
+        
+        // Update the knowledge list in the UI
+        function updateKnowledgeList() {
+            const knowledgeList = document.getElementById('knowledgeList');
+            knowledgeList.innerHTML = '';
+            
+            knowledgeBase.forEach((item, index) => {
+                const knowledgeItem = document.createElement('div');
+                knowledgeItem.className = 'knowledge-item';
+                knowledgeItem.innerHTML = `
+                    <div>
+                        <strong>Q:</strong> ${item.question}<br>
+                        <strong>A:</strong> ${item.answer}
+                    </div>
+                    <button onclick="deleteKnowledge(${index})"><i class="fas fa-trash"></i></button>
+                `;
+                knowledgeList.appendChild(knowledgeItem);
+            });
+        }
+        
+        // Delete a knowledge item
+        function deleteKnowledge(index) {
+            knowledgeBase.splice(index, 1);
+            localStorage.setItem('aiKnowledge', JSON.stringify(knowledgeBase));
+            updateKnowledgeList();
+        }
+        
+        // Function to send a message
+        function sendMessage() {
+            const userInput = document.getElementById('userInput');
+            const message = userInput.value.trim();
+            
+            if (message) {
+                // Add user message to chat
+                addMessage(message, 'user');
+                
+                // Clear input
+                userInput.value = '';
+                
+                // Process and get AI response
+                setTimeout(() => {
+                    const response = getAIResponse(message);
+                    addMessage(response, 'ai');
+                }, 600);
+            }
+        }
+        
+        // Get AI response based on knowledge base
+        function getAIResponse(message) {
+            // Convert message to lowercase for easier matching
+            const lowerMessage = message.toLowerCase();
+            
+            // Check for matches in knowledge base
+            for (const item of knowledgeBase) {
+                // Check if user message contains question from knowledge base
+                if (lowerMessage.includes(item.question.toLowerCase())) {
+                    return item.answer;
+                }
+            }
+            
+            // If no direct match, check for similar questions
+            for (const item of knowledgeBase) {
+                // Simple similarity check (in a real application, you'd use more advanced NLP)
+                if (isSimilar(lowerMessage, item.question.toLowerCase())) {
+                    return item.answer;
+                }
+            }
+            
+            // Default responses if no match found
+            const defaultResponses = [
+                "I'm not sure how to respond to that. Can you teach me?",
+                "I don't have an answer for that yet. Please train me with the correct response.",
+                "That's an interesting question. How should I respond to that?",
+                "I'm still learning. Could you provide me with the appropriate answer for that question?"
+            ];
+            
+            return defaultResponses[Math.floor(Math.random() * defaultResponses.length)];
+        }
+        
+        // Simple similarity function (for demonstration purposes)
+        function isSimilar(str1, str2) {
+            // Check if either string contains the other
+            if (str1.includes(str2) || str2.includes(str1)) {
+                return true;
+            }
+            
+            // Check for common words
+            const words1 = str1.split(' ');
+            const words2 = str2.split(' ');
+            
+            let commonWords = 0;
+            for (const word1 of words1) {
+                if (word1.length > 3 && words2.includes(word1)) {
+                    commonWords++;
+                }
+            }
+            
+            // If more than one common word, consider similar
+            return commonWords > 1;
+        }
+        
+        // Add message to chat
+        function addMessage(text, sender) {
+            const chatBox = document.getElementById('chatBox');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}-message`;
+            messageDiv.textContent = text;
+            chatBox.appendChild(messageDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+        
+        // Allow sending message with Enter key
+        document.getElementById('userInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+    </script>
+</body>
+</html>
